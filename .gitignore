@@ -1,0 +1,3 @@
+*.pyc
+venv**
+srai_athena_backend.egg-info/*

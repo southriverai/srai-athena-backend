@@ -1,0 +1,5 @@
+social-post-api==1.1.1
+haxor==1.2.4
+openai==1.6.1
+beautifulsoup4==4.12.2
+PyGithub==2.1.1
