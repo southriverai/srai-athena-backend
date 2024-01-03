@@ -9,40 +9,40 @@ class PostGenerator:
         self.client_openai = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
     def generate(self, dict_post_template: dict) -> dict:
-        dict_post_template_short = {"goal": dict_post_template["goal"]}
-        dict_post_template_short["list_data_source"] = []
-        for data_source in dict_post_template["list_data_source"]:
-            data_source_short = data_source.copy()
-            data_source_text = data_source["text"]
-            system_message = {
-                "role": "system",
-                "content": """
-                You are a asssitent for shortening summaries of articles
-                """,
-            }
-            promt_message = {
-                "role": "user",
-                "content": f"Shorten the following summary{data_source_text} to about 500words",
-            }
-            list_message = []
-            list_message.append(system_message)
-            list_message.append(promt_message)
-            response = self.client_openai.chat.completions.create(
-                model="gpt-3.5-turbo-16k",
-                messages=list_message,
-                temperature=1,
-            )
-            data_source_short_text = response.choices[0].message.content
+        # dict_post_template_short = {"goal": dict_post_template["goal"]}
+        # dict_post_template_short["list_data_source"] = []
+        # for data_source in dict_post_template["list_data_source"]:
+        #     data_source_short = data_source.copy()
+        #     data_source_text = data_source["text"]
+        #     system_message = {
+        #         "role": "system",
+        #         "content": """
+        #         You are a asssitent for shortening summaries of articles
+        #         """,
+        #     }
+        #     promt_message = {
+        #         "role": "user",
+        #         "content": f"Shorten the following summary{data_source_text} to about 500words",
+        #     }
+        #     list_message = []
+        #     list_message.append(system_message)
+        #     list_message.append(promt_message)
+        #     response = self.client_openai.chat.completions.create(
+        #         model="gpt-3.5-turbo-16k",
+        #         messages=list_message,
+        #         temperature=1,
+        #     )
+        #     data_source_short_text = response.choices[0].message.content
 
-            data_source_short["text"] = data_source_short_text
+        #     data_source_short["text"] = data_source_short_text
 
-            dict_post_template_short["list_data_source"].append(data_source_short)
-            # TODO
+        #     dict_post_template_short["list_data_source"].append(data_source_short)
+        #     # TODO
 
         """
         generate post
         """
-        promt = json.dumps(dict_post_template_short)
+        promt = json.dumps(dict_post_template)
         system_message = {
             "role": "system",
             "content": """

@@ -9,6 +9,7 @@ from bs4 import BeautifulSoup
 from srai_athena_backend.post_generator import PostGenerator
 from datetime import datetime
 from openai import OpenAI
+from typing import List
 
 
 def get_commits_within_dates(repository: Repository, start_date, end_date):
@@ -23,15 +24,17 @@ def print_commit_info(list_commit: list[Commit]):
         print(f"Message: {commit.commit.message}\n")
 
 
-def get_diff_between_commits(
-    repository: Repository,
-    commit_0: Commit,
-    commit_1: Commit,
-):
-    # Get the diff as a string
-    diff_url = repository.compare(commit_0.sha, commit_1.sha).diff_url
-    print(diff_url)
-    return diff_url
+def get_changes_from_commits(
+    list_commit: List[Commit],
+) -> dict:
+    list_chanches = []
+    for commit in list_commit:
+        for file in commit.files:
+            list_chanches.append({"file_name": file.filename, "patch": file.patch})
+
+    dict_changes = {}
+    dict_changes["list_changes"] = list_chanches
+    return dict_changes
 
 
 def get_changes(diff_url: str):
@@ -63,12 +66,14 @@ def get_description(dict_changes: dict):
     dict_description = {"list_description": []}
 
     for change in dict_changes["list_changes"]:
-        print(change)
+        print(change.keys())
         client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
         promt = """
-        Given the following html of a git diff, descrbe in natural language what the change in the code might do. Limit your response to 100 words.
+        Given the following text of a git patch, descrbe in natural language what the change in the code might do. Limit your response to 100 words.
         """
-        promt += change["changes"]
+        if change["patch"] is None:
+            continue
+        promt += change["patch"]
         promt += """
         Do not include any explanations, only provide a RFC8259 compliant JSON response following this format without deviation.
         {
@@ -122,7 +127,7 @@ def main() -> None:
     org = g.get_organization("southriverai")
     name_repo = "srai-athena-backend"
     list_repository = []
-    list_repository.append(org.get_repo("srai-core"))
+    list_repository.append(org.get_repo(name_repo))
     for repository in list_repository:
         start_date = datetime(2023, 8, 27)
         end_date = datetime.now()
@@ -134,23 +139,15 @@ def main() -> None:
             end_date,
         )
 
-        diff_url = get_diff_between_commits(
-            repository,
-            list_commit[0],
-            list_commit[-1],
-        )
+        dict_changes = get_changes_from_commits(list_commit)
 
     # cache_changes
-    print(diff_url)
-    url = f"https://github.com/southriverai/{name_repo}/diffs?bytes=11102&lines=350&sha1=133dca8c42e6fbca2206acb37b6b638616d77750&sha2=86026afac2d95973167649e9698784646c4951b4&start_entry=14&sticky=false&w=false"
-    print(url)
-    exit()
     if os.path.exists(path_file_changes):
-        with open("changes.json", "r") as f:
+        with open(path_file_changes, "r") as f:
             dict_changes = json.load(f)
     else:
-        dict_changes = get_changes(url)
-        with open("changes.json", "w") as f:
+        dict_changes = get_changes_from_commits(list_commit)
+        with open(path_file_changes, "w") as f:
             json.dump(dict_changes, f)
 
     # cache change summery
@@ -161,6 +158,14 @@ def main() -> None:
         post_template = get_description(dict_changes)
         with open(path_file_post_template, "w") as f:
             json.dump(post_template, f)
+
+    post_template_new = {}
+    post_template_new["list_datasource"] = []
+    post_template_new[
+        "goal"
+    ] = """ Given a list of descriptions write a 300 word blog about the code changes that happend this week"""
+    for description in post_template["list_description"]:
+        post_template_new["list_datasource"].append({"text": description})
 
     # cache post
     if os.path.exists(path_file_post):
