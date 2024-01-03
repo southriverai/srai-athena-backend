@@ -9,7 +9,7 @@ from srai_athena_backend.post_generator import PostGenerator
 
 
 def main() -> None:
-    path_dir_post = os.path.join("..", "srai-athena-content", "20231230")
+    path_dir_post = os.path.join("..", "srai-athena-content", "20240102")
     if not os.path.exists(path_dir_post):
         os.mkdir(path_dir_post)
     path_file_selection = os.path.join(path_dir_post, "selection.json")

@@ -65,8 +65,16 @@ class PostGenerator:
             messages=list_message,
             temperature=1,
         )
+
+        suffix = """
+        Generation Code Repo
+        https://lnkd.in/eTXDGWxY
+        Content repo
+        https://lnkd.in/e9ZhJeQZ
+        """
         dict_post = {
             "title": "title_0",
             "text generated": response.choices[0].message.content,
+            "suffix": suffix,
         }
         return dict_post
