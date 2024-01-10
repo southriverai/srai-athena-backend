@@ -98,7 +98,7 @@ def build_template(dict_story: Dict[str, str], list_selected_title: dict) -> dic
     ] = """
     Create a blog post that relates to the datasources for a socail media AI company of araound 500 words.
     The company is called South River AI they are developing Athena a social media interaction application.
-    The application is designed to help users interact with social media in a more productive way. 
+    The application is designed to help users interact with social media in a more productive way.
     It systhesizes posts from a variety of sources and presents them to the user in a way that is more condusive to productivity.
     """
     dict_prompt["list_data_source"] = []

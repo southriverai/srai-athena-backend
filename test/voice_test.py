@@ -3,7 +3,6 @@ from datetime import datetime
 import json
 import os
 from srai_athena_backend.post_generator import PostGenerator
-import requests
 
 
 def build_dict_post_template(path_file_transcript: str) -> dict:
@@ -13,7 +12,9 @@ def build_dict_post_template(path_file_transcript: str) -> dict:
     with open(path_file_transcript, "r") as f:
         transcrip_text = f.read()
     goal = """
-    Given a transcript write a blog post about the content of the transcript
+    Given a transcript write a blog post about the content of the transcript.
+    Write the blog in the frist person.
+    Be consice and to the point. Dont use flowery language.
     """
     post_template = {
         "goal": goal,
@@ -27,7 +28,8 @@ def build_dict_post_template(path_file_transcript: str) -> dict:
 def main() -> None:
     # get date
     generator = PostGenerator()
-    path_dir_post = os.path.join("..", "srai-athena-content", "20231229")
+    date_str = datetime.now().strftime("%Y-%m-%d")
+    path_dir_post = os.path.join("..", "srai-athena-content", date_str)
     path_file_transcript = os.path.join(path_dir_post, "transcript.txt")
     path_file_post_template = os.path.join(path_dir_post, "post_template.json")
     path_file_post = os.path.join(path_dir_post, "post.json")
