@@ -7,7 +7,7 @@ import requests
 import json
 from bs4 import BeautifulSoup
 from srai_athena_backend.post_generator import PostGenerator
-from datetime import datetime
+from datetime import datetime, timedelta
 from openai import OpenAI
 from typing import List
 
@@ -114,7 +114,8 @@ def get_description(dict_changes: dict):
 def main() -> None:
     # using an access token
     auth = Auth.Token(os.environ["GITHUB_TOKEN"])
-    path_dir_post = os.path.join("..", "srai-athena-content", "2024-01-03")
+    date_str = datetime.now().strftime("%Y-%m-%d")
+    path_dir_post = os.path.join("..", "srai-athena-content", date_str)
     if not os.path.exists(path_dir_post):
         os.mkdir(path_dir_post)
     path_file_changes = os.path.join(path_dir_post, "changes.json")
@@ -129,8 +130,9 @@ def main() -> None:
     list_repository = []
     list_repository.append(org.get_repo(name_repo))
     for repository in list_repository:
-        start_date = datetime(2023, 8, 27)
         end_date = datetime.now()
+        # one week before
+        start_date = end_date - timedelta(days=7)
 
         # Fetch commits
         list_commit = get_commits_within_dates(
